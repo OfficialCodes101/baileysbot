@@ -1,9 +1,12 @@
 require("dotenv").config();
 
 module.exports.contextParser = (data) => {
+  const sender = data.key.participant
+    ? data.key.participant
+    : data.key.remoteJid;
   return {
     stanzaId: data.key.id,
-    participant: data.key.participant,
+    participant: sender,
     quotedMessage: {
       conversation: data.text,
     },
@@ -67,9 +70,9 @@ module.exports.getMentions = (data) => {
   return new Set(mentions);
 };
 
-module.exports.isSudo = (senderJid) => {
-  const sudoArray = JSON.parse(process.env.SUDO);
-  return sudoArray.includes(senderJid);
+module.exports.isStrong = (senderJid) => {
+  const strongArr = process.env.STRONG.split(",");
+  return strongArr.includes(senderJid);
 };
 
 module.exports.getAllJids = (data, text) => {

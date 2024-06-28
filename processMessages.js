@@ -1,4 +1,9 @@
-const { getBody, getSender, isSudo } = require("./util/helpers");
+const {
+  getBody,
+  getSender,
+  isStrong,
+  contextParser,
+} = require("./util/helpers");
 const commands = require("./lib");
 require("dotenv").config();
 
@@ -38,27 +43,22 @@ module.exports.default = async (sock, messages) => {
     };
 
     const senderJid = getSender(data);
-    if (!isSudo(senderJid)) {
-      return;
+    if (!isStrong(senderJid)) {
+      return await sock.sendMessage(data.key.remoteJid, {
+        text: "You are weak my friend",
+        contextInfo: contextParser(data),
+      });
     }
 
     switch (command.toLowerCase()) {
-      case "greet":
-        return await commands.greet(sock, data);
-      case "setgreet":
-        return await commands.setGreet(sock, data, matches[2]);
-      case "tag":
-        return await commands.tag(sock, data, matches[2]);
-      case "tagall":
-        return await commands.tag(sock, data, "all");
-      case "getsudo":
-        return await commands.getSudo(sock, data);
-      case "setsudo":
-        return await commands.setAndDelSudo(sock, data, matches[2], "set");
-      case "delsudo":
-        return await commands.setAndDelSudo(sock, data, matches[2], "del");
-      case "img":
-        return await commands.img(sock, data, matches[2]);
+      case "getstrong":
+        return await commands.getStrong(sock, data);
+      case "setstrong":
+        return await commands.setAndDelStrong(sock, data, matches[2], "set");
+      case "delstrong":
+        return await commands.setAndDelStrong(sock, data, matches[2], "del");
+      case "arise":
+        return await commands.arise(sock, data);
     }
   });
 };
