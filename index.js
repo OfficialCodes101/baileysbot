@@ -35,8 +35,14 @@ async function connectToWhatsApp() {
   });
   sock.ev.on("messages.upsert", async (m) => {
     console.log(JSON.stringify(m.messages, undefined, 2));
-    if (m.type === "notify") {
-      await processMessages(sock, m.messages);
+    try {
+      if (m.type === "notify") {
+        await processMessages(sock, m.messages);
+      }
+    } catch (err) {
+      await sock.sendMessage(m.messages[0].key.remoteJid, {
+        text: "An error occured",
+      });
     }
   });
   sock.ev.on("creds.update", saveCreds);
